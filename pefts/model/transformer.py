@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from transformers import GPT2LMHeadModel
 
+from ..peft import Peft
 from .block import TransformerBlock
 from .config import Config
 
@@ -26,16 +27,19 @@ class Transformer(nn.Module):
             [TransformerBlock(config) for _ in range(config.n_layers)]
         )
         self.ln_f = nn.LayerNorm(config.d_model)
-        self.unembedding = nn.Linear(config.d_model, config.vocab_size)
+        self.unembedding = nn.Linear(config.d_model, config.vocab_size, bias=False)
 
     @classmethod
-    def from_pretrained(cls, model_name: str) -> "Transformer":
+    def from_pretrained(
+        cls, model_name: str, peft: Peft | None = None
+    ) -> "Transformer":
         """Load a pretrained model from Hugging Face's Transformers library.
         This closely follows Karpathy's minGPT loader, it was used as a reference.
 
         Args:
             model_name: The name of the model to load.
                 Should be one of "gpt2".
+            peft: The parameter efficient fine-tuning module.
 
         Returns:
             The pretrained model.
@@ -43,7 +47,12 @@ class Transformer(nn.Module):
 
         configs = {
             "gpt2": Config(
-                n_layers=12, n_heads=12, d_model=768, vocab_size=50257, block_size=1024
+                n_layers=12,
+                n_heads=12,
+                d_model=768,
+                vocab_size=50257,
+                block_size=1024,
+                peft=peft,
             )
         }
 

@@ -29,5 +29,6 @@ class Trainer:
             for batch in dataset:
                 self.optimizer.zero_grad()
                 _, loss = self.model(batch[:, :-1], batch[:, 1:])
+                print(loss.item())
                 loss.backward()
                 self.optimizer.step()

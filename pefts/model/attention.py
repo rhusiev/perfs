@@ -19,9 +19,10 @@ class MultiHeadAttention(nn.Module):
         # key, query, value projections for all heads, but as one concatenated tensor
         # We're keeping them conctenated just so that we can do LoRA finetunes
         # on them - otherwise we would split them up for readability
-        self.q = nn.Linear(config.d_model, config.d_model)
+        # self.q = nn.Linear(config.d_model, config.d_model)
+        self.q = (config.peft or nn.Linear)(config.d_model, config.d_model)
         self.k = nn.Linear(config.d_model, config.d_model)
-        self.v = nn.Linear(config.d_model, config.d_model)
+        self.v = (config.peft or nn.Linear)(config.d_model, config.d_model)
 
         self.output = nn.Linear(config.d_model, config.d_model)
 

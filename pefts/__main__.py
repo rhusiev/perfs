@@ -1,12 +1,22 @@
 import torch
 
 from .dataset import RecursiveDirectoryListerDataset
+from .layers.lora import LoRAPeft
 from .model import Transformer
 from .trainer import Trainer
 
 if __name__ == "__main__":
-    dataset = RecursiveDirectoryListerDataset("data", "gpt2")
-    model = Transformer.from_pretrained("gpt2")
-    optimizer = torch.optim.Adam(model.parameters())
+    dataset = RecursiveDirectoryListerDataset("data/prompters", "gpt2")
+    peft = LoRAPeft(lora_rank=4)
+    model = Transformer.from_pretrained("gpt2", peft=peft)
+
+    # Now we freeze everything except the LoRALinear layers
+    for name, param in model.named_parameters():
+        if "peft" not in name:
+            param.requires_grad = False
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     trainer = Trainer(model, optimizer)
     trainer.train(dataset, epochs=1)
+    torch.save(peft.state_dict(), "tune.pt")
+    # peft.load_state_dict(torch.load("tune.pt"))

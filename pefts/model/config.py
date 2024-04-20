@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from ..peft import Peft
+
 
 @dataclass
 class Config:
@@ -18,6 +20,8 @@ class Config:
     d_model: int
     vocab_size: int
     block_size: int
+
+    peft: Peft | None = None
 
     @property
     def d_embedding(self) -> int:
