@@ -79,12 +79,6 @@ class Transformer(nn.Module):
         }
 
         for k in hf_state_dictionary:
-            if k.endswith("attn.masked_bias"):
-                print(k)
-                continue
-
-            print(k)
-
             k_own = k
             for k_source, k_target in name_map.items():
                 k_own = k_own.replace(k_source, k_target)
