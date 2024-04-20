@@ -178,6 +178,7 @@ class Transformer(nn.Module):
         self,
         prompt: list[int] | torch.Tensor,
         max_len: int,
+        eos_token: int | None = None,
     ) -> torch.Tensor:
         """Generate a sequence of tokens from a prompt.
 
@@ -185,6 +186,7 @@ class Transformer(nn.Module):
             prompt: The prompt to generate from.
             max_len: The maximum length of the generated sequence.
             tokenizer: The tokenizer to use.
+            eos_token: The token that marks the end of a sequence.
 
         Returns:
             The generated sequence of tokens.
@@ -196,6 +198,8 @@ class Transformer(nn.Module):
                 logits = self.forward(inp)[0]
                 last_level_logits = logits[0, -1, :]
                 next_token = last_level_logits.argmax().item()
+                if next_token == eos_token:
+                    break
                 inp = torch.cat([inp, torch.tensor([next_token]).unsqueeze(0)], dim=1)
 
         return inp
