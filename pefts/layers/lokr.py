@@ -83,8 +83,8 @@ class LoKrLinear(nn.Linear):
         return nn.functional.linear(x, weight, self.bias)
 
 
-class LoKRPeft(Peft):
-    """LoKR (Low-rank adaptation with Kronecker product) for Linear layers."""
+class LoKrPeft(Peft):
+    """LoKr (Low-rank adaptation with Kronecker product) for Linear layers."""
 
     def __init__(self, lokr_rank: int = 4, factor: int = 8) -> None:
         """Initialize LoKr for Linear layers.
