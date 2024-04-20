@@ -1,9 +1,9 @@
 import torch
 
-from .dataset import RecursiveDirectoryListerDataset
-from .layers.lora import LoRAPeft
-from .model import Transformer
-from .trainer import Trainer
+from pefts.dataset import RecursiveDirectoryListerDataset
+from pefts.layers.lora import LoRAPeft
+from pefts.model import Transformer
+from pefts.trainer import Trainer
 
 if __name__ == "__main__":
     dataset = RecursiveDirectoryListerDataset("data/prompters", "gpt2")
