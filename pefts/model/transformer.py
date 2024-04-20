@@ -23,8 +23,8 @@ class Transformer(nn.Module):
 
         self.token_embeddings = nn.Embedding(config.vocab_size, config.d_model)
         self.position_embeddings = nn.Embedding(config.block_size, config.d_model)
-        self.tower = nn.ModuleList(
-            [TransformerBlock(config) for _ in range(config.n_layers)]
+        self.tower = nn.Sequential(
+            *(TransformerBlock(config) for _ in range(config.n_layers))
         )
         self.ln_f = nn.LayerNorm(config.d_model)
         self.unembedding = nn.Linear(config.d_model, config.vocab_size, bias=False)
@@ -79,6 +79,9 @@ class Transformer(nn.Module):
         }
 
         for k in hf_state_dictionary:
+            if k.endswith("attn.masked_bias"):
+                continue
+
             k_own = k
             for k_source, k_target in name_map.items():
                 k_own = k_own.replace(k_source, k_target)
@@ -157,8 +160,7 @@ class Transformer(nn.Module):
             .to(x.device)
             .unsqueeze(0)
         )
-        for block in self.tower:
-            e = block(e)
+        e = self.tower(e)
         e = self.ln_f(e)
         logits = self.unembedding(e)
 
