@@ -126,6 +126,9 @@ class LoHaPeft(Peft):
         } | {
             f"layers.{i}.peft_loha_A2": layer.peft_loha_A2
             for i, layer in enumerate(self.layers)
+        } | {
+            f"layers.{i}.gamma_value": layer.gamma_value
+            for i, layer in enumerate(self.layers)
         }
     
     def load_state_dict(self, state_dict: dict[str, nn.Parameter]) -> None:
@@ -139,4 +142,6 @@ class LoHaPeft(Peft):
             layer.peft_loha_A1 = state_dict[f"layers.{i}.peft_loha_A1"]
             layer.peft_loha_B2 = state_dict[f"layers.{i}.peft_loha_B2"]
             layer.peft_loha_A2 = state_dict[f"layers.{i}.peft_loha_A2"]
+            layer.gamma_value = state_dict[f"layers.{i}.gamma_value"]
+            
 
