@@ -2,6 +2,7 @@ import torch
 from transformers import AutoTokenizer
 
 from pefts.layers.lora import LoRAPeft
+from pefts.layers.lokr import LoKrPeft
 from pefts.peft import Peft
 from pefts.model import Transformer
 
@@ -48,9 +49,20 @@ class Inference:
 
 
 if __name__ == "__main__":
-    peft = LoRAPeft(lora_rank=4)
-    file_path = "tune.pt"
     pretrained_name = "gpt2"
 
+    print("Original")
+    inference = Inference(pretrained_name=pretrained_name)
+    print(inference("Who was Jim Henson? Jim Henson was a"))
+
+    print("LoRA")
+    peft = LoRAPeft(lora_rank=4)
+    file_path = "lora.pt"
+    inference = Inference(peft=(peft, file_path), pretrained_name=pretrained_name)
+    print(inference("Who was Jim Henson? Jim Henson was a"))
+
+    print("LoKr")
+    peft = LoKrPeft()
+    file_path = "lokr.pt"
     inference = Inference(peft=(peft, file_path), pretrained_name=pretrained_name)
     print(inference("Who was Jim Henson? Jim Henson was a"))
