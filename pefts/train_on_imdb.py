@@ -11,7 +11,7 @@ from pefts.trainer import Trainer
 if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
     format_message = (
-        lambda x: f'{x["review"]}{tokenizer.eos_token}{"negative" if x["label"] else "positive"}{tokenizer.eos_token}'
+            lambda x: f'{x["review"]}\nSentiment: {"negative" if x["label"] else "positive"}'
     )
     dataset = HFDatasetIterator(
         {

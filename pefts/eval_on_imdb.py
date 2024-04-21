@@ -17,7 +17,7 @@ if __name__ == "__main__":
     dataset = (
         load_dataset("ajaykarthick/imdb-movie-reviews")["test"]
         .shuffle(0)
-        .select(500)
+        .select(range(500))
         .map(
             lambda x: {"text": format_message(x), "label": x["label"]},
         )
