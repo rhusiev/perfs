@@ -139,13 +139,13 @@ class LoKrPeft(Peft):
             dict[str, nn.Parameter]: State dictionary of the LoKr layers
         """
         return {
-            f"layers.{i}.peft_lora_A": layer.peft_lokr_A
+            f"layers.{i}.peft_lokr_A": layer.peft_lokr_A
             for i, layer in enumerate(self.layers)
         } | {
-            f"layers.{i}.peft_lora_B": layer.peft_lokr_B
+            f"layers.{i}.peft_lokr_B": layer.peft_lokr_B
             for i, layer in enumerate(self.layers)
         } | {
-            f"layers.{i}.peft_lora_C": layer.peft_lokr_C
+            f"layers.{i}.peft_lokr_C": layer.peft_lokr_C
             for i, layer in enumerate(self.layers)
         }
 
@@ -156,6 +156,6 @@ class LoKrPeft(Peft):
             state_dict (dict[str, nn.Parameter]): State dictionary of the LoKr layers
         """
         for i, layer in enumerate(self.layers):
-            layer.peft_lora_A = state_dict[f"layers.{i}.peft_lokr_A"]
-            layer.peft_lora_B = state_dict[f"layers.{i}.peft_lokr_B"]
-            layer.peft_lora_C = state_dict[f"layers.{i}.peft_lokr_C"]
+            layer.peft_lokr_A = state_dict[f"layers.{i}.peft_lokr_A"]
+            layer.peft_lokr_B = state_dict[f"layers.{i}.peft_lokr_B"]
+            layer.peft_lokr_C = state_dict[f"layers.{i}.peft_lokr_C"]

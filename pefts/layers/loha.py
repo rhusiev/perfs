@@ -38,7 +38,7 @@ class LoHaLinear(nn.Linear):
         nn.init.zeros_(self.peft_loha_B2)
 
         #for scaling parameter, single value with standard normal distribution
-        self.gamma_value = nn.Parameter(torch.randn(1))
+        self.peft_loha_gamma_value = nn.Parameter(torch.randn(1))
     
     def calculating_hadamard(self):
         """Calculating Hadamart Product
@@ -75,7 +75,7 @@ class LoHaLinear(nn.Linear):
             torch.Tensor: Output tensor of shape (batch_size, out_features)
         """
         # Apply LoHa
-        weight = self.weight + self.gamma_value * self.calculating_hadamard()
+        weight = self.weight + self.peft_loha_gamma_value * self.calculating_hadamard()
         # Apply Linear layer
         return nn.functional.linear(x, weight, self.bias)
     
@@ -93,7 +93,7 @@ class LoHaLinear(nn.Linear):
         self.peft_loha_A1 = self.peft_loha_A1.to(*args, **kwargs)
         self.peft_loha_B2 = self.peft_loha_B2.to(*args, **kwargs)
         self.peft_loha_A2 = self.peft_loha_A2.to(*args, **kwargs)
-        self.gamma_value = self.gamma_value.to(*args, **kwargs)
+        self.peft_loha_gamma_value = self.peft_loha_gamma_value.to(*args, **kwargs)
         return super().to(*args, **kwargs)
 
 
@@ -143,7 +143,7 @@ class LoHaPeft(Peft):
             f"layers.{i}.peft_loha_A2": layer.peft_loha_A2
             for i, layer in enumerate(self.layers)
         } | {
-            f"layers.{i}.gamma_value": layer.gamma_value
+            f"layers.{i}.peft_loha_gamma_value": layer.peft_loha_gamma_value
             for i, layer in enumerate(self.layers)
         }
     
@@ -158,6 +158,4 @@ class LoHaPeft(Peft):
             layer.peft_loha_A1 = state_dict[f"layers.{i}.peft_loha_A1"]
             layer.peft_loha_B2 = state_dict[f"layers.{i}.peft_loha_B2"]
             layer.peft_loha_A2 = state_dict[f"layers.{i}.peft_loha_A2"]
-            layer.gamma_value = state_dict[f"layers.{i}.gamma_value"]
-            
-
+            layer.peft_loha_gamma_value = state_dict[f"layers.{i}.peft_loha_gamma_value"]
