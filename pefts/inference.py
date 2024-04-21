@@ -49,6 +49,8 @@ class Inference:
         """
         encoded_prompt = self.tokenizer.encode(prompt)
         encoded_prompt = torch.tensor(encoded_prompt).to(self.device)
+        if encoded_prompt.size(0) > 500:
+            encoded_prompt = encoded_prompt[-500:]
         generated = self.model.generate(encoded_prompt, max_tokens)
         return self.tokenizer.decode(generated[0].tolist())
 
