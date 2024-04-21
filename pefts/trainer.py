@@ -17,6 +17,7 @@ class Trainer:
         """
         self.model = model
         self.optimizer = optimizer
+        self.device = next(model.parameters()).device
 
     def train(self, dataset: Iterable[torch.Tensor], epochs: int = 1) -> None:
         """Train the model on the given dataset.
@@ -28,7 +29,7 @@ class Trainer:
         for _ in range(epochs):
             for batch in dataset:
                 self.optimizer.zero_grad()
-                _, loss = self.model(batch[:, :-1], batch[:, 1:])
+                _, loss = self.model(batch[:, :-1].to(self.device), batch[:, 1:].to(self.device))
                 print(loss.item())
                 loss.backward()
                 self.optimizer.step()
