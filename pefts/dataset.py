@@ -71,7 +71,7 @@ class HFDatasetIterator:
             if example.size(0) > 500:
                 continue
             batch.append(example)
-            if len(batch) == 8:
+            if len(batch) == 1:
                 max_len = max([example.size(0) for example in batch])
                 batch = [
                     torch.cat(

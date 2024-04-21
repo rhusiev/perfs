@@ -13,7 +13,7 @@ from pefts.inference import Inference
 
 if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    format_message = lambda x: f'{x["review"]}{tokenizer.eos_token}'
+    format_message = lambda x: f'{x["review"]}\nSentiment:'
     dataset = (
         load_dataset("ajaykarthick/imdb-movie-reviews")["test"]
         .shuffle(0)
@@ -32,6 +32,7 @@ if __name__ == "__main__":
         completion = inference(example["text"], 2)
         if ("negative" if example["label"] else "positive") in completion:
             correct += 1
+        # print(completion[-40:])
         print(
             f"\rAccuracy: {correct / total:.2%}  Done: {total}/{len(dataset)}",
             end="                        ",

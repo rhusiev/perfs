@@ -4,6 +4,7 @@ from transformers import AutoTokenizer
 
 from pefts.dataset import HFDatasetIterator
 from pefts.layers.lora import LoRAPeft
+from pefts.layers.loha import LoHaPeft
 from pefts.layers.lokr import LoKrPeft
 from pefts.model import Transformer
 from pefts.trainer import Trainer
