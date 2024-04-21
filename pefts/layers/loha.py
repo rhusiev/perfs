@@ -101,9 +101,9 @@ class LoHaPeft(Peft):
             out_features (int): Number of output features
 
         Returns:
-            nn.Linear: Linear layer with LoRA
+            nn.Linear: Linear layer with LoHa
         """
-        layer = LoHaLinear(in_features, out_features, lora_rank=self.lora_rank)
+        layer = LoHaLinear(in_features, out_features, loha_rank=self.loha_rank)
         self.layers.append(layer)
         return layer
 
@@ -112,7 +112,7 @@ class LoHaPeft(Peft):
         You can use torch.save(peft.state_dict(), "finetune.pth")
 
         Returns:
-            dict[str, nn.Parameter]: State dictionary of the LoRA layers
+            dict[str, nn.Parameter]: State dictionary of the LoHa layers
         """
         return {
             f"layers.{i}.peft_loha_B1": layer.peft_loha_B1
@@ -135,7 +135,7 @@ class LoHaPeft(Peft):
         """Load the state dictionary of the LoHa layers
 
         Args:
-            state_dict (dict[str, nn.Parameter]): State dictionary of the LoRA layers
+            state_dict (dict[str, nn.Parameter]): State dictionary of the LoHa layers
         """
         for i, layer in enumerate(self.layers):
             layer.peft_loha_B1 = state_dict[f"layers.{i}.peft_loha_B1"]
