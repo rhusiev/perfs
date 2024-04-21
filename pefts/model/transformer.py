@@ -137,12 +137,15 @@ class Transformer(nn.Module):
 
     @overload
     def forward(
-        self, x: torch.Tensor, targets: torch.Tensor
+        self, x: torch.Tensor, targets: torch.Tensor, attention_mask: torch.Tensor
     ) -> tuple[torch.Tensor, torch.Tensor]:
         ...
 
     def forward(
-        self, x: torch.Tensor, targets: torch.Tensor | None = None
+        self,
+        x: torch.Tensor,
+        targets: torch.Tensor | None = None,
+        attention_mask: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor | None]:
         """Perform the forward pass through the
         transformer model.
@@ -150,6 +153,7 @@ class Transformer(nn.Module):
         Args:
             x: The input tensor, with shape (batch_size, seq_len).
             targets: The target tensor, with shape (batch_size, seq_len).
+            attention_mask: The attention mask tensor, with shape (batch_size, seq_len).
 
         Returns:
             The logits, with shape (batch_size, seq_len, vocab_size).
@@ -164,9 +168,18 @@ class Transformer(nn.Module):
         e = self.ln_f(e)
         logits = self.unembedding(e)
 
+        if attention_mask is not None:
+            logits = logits.masked_fill(
+                attention_mask.unsqueeze(-1) == 0, float("-inf")
+            )
+
         loss = None
         if targets is not None:
-            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+            if attention_mask is not None:
+                targets = targets.masked_fill(attention_mask == 0, -100)
+            loss = F.cross_entropy(
+                logits.view(-1, logits.size(-1)), targets.view(-1), ignore_index=-100
+            )
 
         return logits, loss
 
@@ -196,6 +209,8 @@ class Transformer(nn.Module):
                 next_token = last_level_logits.argmax().item()
                 if next_token == eos_token:
                     break
-                inp = torch.cat([inp, torch.tensor([next_token]).unsqueeze(0).to(inp.device)], dim=1)
+                inp = torch.cat(
+                    [inp, torch.tensor([next_token]).unsqueeze(0).to(inp.device)], dim=1
+                )
 
         return inp

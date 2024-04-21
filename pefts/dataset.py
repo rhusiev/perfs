@@ -57,16 +57,43 @@ class HFDatasetIterator:
         )
         self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
 
-    def __iter__(self) -> Iterator[torch.Tensor]:
+    def __iter__(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:
         """Iterate over the dataset.
 
         Yields:
             The tokenized contents of each example.
         """
+        batch = []
         for example in self.dataset["train"]["text"]:
             if len(example) == 0:
                 continue
             example = torch.tensor(self.tokenizer.encode(example), dtype=torch.long)
             if example.size(0) > 1024:
                 continue
-            yield example.unsqueeze(0)
+            batch.append(example)
+            if len(batch) == 8:
+                max_len = max([example.size(0) for example in batch])
+                batch = [
+                    torch.cat(
+                        [
+                            example,
+                            torch.zeros(max_len - example.size(0), dtype=torch.long),
+                        ]
+                    )
+                    for example in batch
+                ]
+                attention_mask = torch.stack(
+                    [
+                        torch.cat(
+                            [
+                                torch.ones(example.size(0)),
+                                torch.zeros(max_len - example.size(0) - 1),
+                            ]
+                            if max_len > example.size(0)
+                            else [torch.ones(max_len - 1)]
+                        )
+                        for example in batch
+                    ]
+                ).to(torch.long)
+                yield torch.stack(batch).to(torch.long), attention_mask
+                batch = []
