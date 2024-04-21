@@ -68,7 +68,7 @@ class HFDatasetIterator:
             if len(example) == 0:
                 continue
             example = torch.tensor(self.tokenizer.encode(example), dtype=torch.long)
-            if example.size(0) > 1024:
+            if example.size(0) > 512:
                 continue
             batch.append(example)
             if len(batch) == 8:

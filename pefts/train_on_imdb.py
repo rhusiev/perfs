@@ -10,11 +10,11 @@ from pefts.trainer import Trainer
 if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("gpt2")
     format_message = (
-        lambda x: f"{x["review"]}{tokenizer.eos_token}{"negative" if x["label"] else "positive"}{tokenizer.eos_token}"
+        lambda x: f'{x["review"]}{tokenizer.eos_token}{"negative" if x["label"] else "positive"}{tokenizer.eos_token}'
     )
     dataset = HFDatasetIterator(
         {
-            "train": load_dataset("ajaykarthick/imdb-movie-reviews")["train"].map(
+            "train": load_dataset("ajaykarthick/imdb-movie-reviews")["train"].shuffle(0).select(range(2000)).map(
                 lambda x: {"text": format_message(x)}
             ),
         },
