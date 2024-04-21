@@ -82,6 +82,21 @@ class LoKrLinear(nn.Linear):
         # Apply Linear layer
         return nn.functional.linear(x, weight, self.bias)
 
+    def to(self, *args, **kwargs) -> "LoKrLinear":
+        """Move the LoKrLinear layer to a device.
+
+        Args:
+            *args: Arguments for the to method
+            **kwargs: Keyword arguments for the to method
+
+        Returns:
+            LoKrLinear: Moved LoKrLinear layer
+        """
+        self.peft_lokr_A = self.peft_lokr_A.to(*args, **kwargs)
+        self.peft_lokr_B = self.peft_lokr_B.to(*args, **kwargs)
+        self.peft_lokr_C = self.peft_lokr_C.to(*args, **kwargs)
+        return super().to(*args, **kwargs)
+
 
 class LoKrPeft(Peft):
     """LoKr (Low-rank adaptation with Kronecker product) for Linear layers."""

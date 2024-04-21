@@ -37,6 +37,16 @@ class LoRALinear(nn.Linear):
         # Apply Linear layer
         return nn.functional.linear(x, weight, self.bias)
 
+    def to(self, *args, **kwargs) -> "LoRALinear":
+        """Move the Linear layer with LoRA to a device
+
+        Returns:
+            LoRALinear: Linear layer with LoRA on a device
+        """
+        self.peft_lora_A = self.peft_lora_A.to(*args, **kwargs)
+        self.peft_lora_B = self.peft_lora_B.to(*args, **kwargs)
+        return super().to(*args, **kwargs)
+
 
 class LoRAPeft(Peft):
     """LoRA (Low-Rank Adaptation) for Linear layers"""

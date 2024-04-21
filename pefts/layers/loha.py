@@ -79,6 +79,22 @@ class LoHaLinear(nn.Linear):
         # Apply Linear layer
         return nn.functional.linear(x, weight, self.bias)
     
+    def to(self, *args, **kwargs):
+        """Move the Linear layer with LoHa to a specified device
+
+        Args:
+            *args: Arguments for the to method
+            **kwargs: Keyword arguments for the to method
+
+        Returns:
+            LoHaLinear: Linear layer with LoHa on the specified device
+        """
+        self.peft_loha_B1 = self.peft_loha_B1.to(*args, **kwargs)
+        self.peft_loha_A1 = self.peft_loha_A1.to(*args, **kwargs)
+        self.peft_loha_B2 = self.peft_loha_B2.to(*args, **kwargs)
+        self.peft_loha_A2 = self.peft_loha_A2.to(*args, **kwargs)
+        self.gamma_value = self.gamma_value.to(*args, **kwargs)
+        return super().to(*args, **kwargs)
 
 
 class LoHaPeft(Peft):
