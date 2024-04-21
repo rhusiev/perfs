@@ -21,6 +21,8 @@ class Inference:
             pretrained_name (str, optional): The name of the pre-trained model.
             Defaults to "gpt2".
         """
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         if peft:
             model = Transformer.from_pretrained(pretrained_name, peft=peft[0])
 
@@ -33,6 +35,8 @@ class Inference:
         self.model = model
         self.tokenizer = AutoTokenizer.from_pretrained(pretrained_name)
 
+        self.model.to(self.device)
+
     def __call__(self, prompt: str, max_tokens: int = 10) -> str:
         """Generate a completion for a given prompt.
 
@@ -44,6 +48,7 @@ class Inference:
             str: The generated completion.
         """
         encoded_prompt = self.tokenizer.encode(prompt)
+        encoded_prompt = torch.tensor(encoded_prompt).to(self.device)
         generated = self.model.generate(encoded_prompt, max_tokens)
         return self.tokenizer.decode(generated[0].tolist())
 

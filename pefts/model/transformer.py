@@ -187,7 +187,7 @@ class Transformer(nn.Module):
         Returns:
             The generated sequence of tokens.
         """
-        inp = torch.tensor(prompt).unsqueeze(0)
+        inp = prompt.clone().detach().unsqueeze(0)
         self.eval()
         with torch.no_grad():
             for _ in range(max_len):
@@ -196,6 +196,6 @@ class Transformer(nn.Module):
                 next_token = last_level_logits.argmax().item()
                 if next_token == eos_token:
                     break
-                inp = torch.cat([inp, torch.tensor([next_token]).unsqueeze(0)], dim=1)
+                inp = torch.cat([inp, torch.tensor([next_token]).unsqueeze(0).to(inp.device)], dim=1)
 
         return inp

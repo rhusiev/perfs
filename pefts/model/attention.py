@@ -58,7 +58,7 @@ class MultiHeadAttention(nn.Module):
         return att.masked_fill(
             torch.tril(torch.ones(att.size(-2), att.size(-1))).view(
                 1, 1, att.size(-2), att.size(-1)
-            )
+            ).to(att.device)
             == 0,
             float("-inf"),
         )
