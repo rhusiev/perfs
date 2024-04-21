@@ -96,5 +96,5 @@ class LoRAPeft(Peft):
             state_dict (dict[str, nn.Parameter]): State dictionary of the LoRA layers
         """
         for i, layer in enumerate(self.layers):
-            layer.peft_lora_A = state_dict[f"layers.{i}.peft_lora_A"]
-            layer.peft_lora_B = state_dict[f"layers.{i}.peft_lora_B"]
+            layer.peft_lora_A = state_dict[f"layers.{i}.peft_loha_A"]
+            layer.peft_lora_B = state_dict[f"layers.{i}.peft_loha_B"]

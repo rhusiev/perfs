@@ -76,7 +76,6 @@ class LoKrLinear(nn.Linear):
             torch.Tensor: Output tensor of shape (batch_size, out_features)
         """
         # Apply LoKr
-        # TODO: mb convert to linear layers
         BA = self.peft_lokr_B @ self.peft_lokr_A
         weight = self.weight + torch.kron(self.peft_lokr_C, BA)
         # Apply Linear layer
@@ -157,6 +156,6 @@ class LoKrPeft(Peft):
             state_dict (dict[str, nn.Parameter]): State dictionary of the LoKr layers
         """
         for i, layer in enumerate(self.layers):
-            layer.peft_lora_A = state_dict[f"layers.{i}.peft_lora_A"]
-            layer.peft_lora_B = state_dict[f"layers.{i}.peft_lora_B"]
-            layer.peft_lora_C = state_dict[f"layers.{i}.peft_lora_C"]
+            layer.peft_lora_A = state_dict[f"layers.{i}.peft_lokr_A"]
+            layer.peft_lora_B = state_dict[f"layers.{i}.peft_lokr_B"]
+            layer.peft_lora_C = state_dict[f"layers.{i}.peft_lokr_C"]
