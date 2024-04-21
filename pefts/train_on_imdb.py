@@ -22,7 +22,7 @@ if __name__ == "__main__":
         },
         "gpt2",
     )
-    peft = LoRAPeft(6)
+    peft = LoKrPeft(36, 6)
     model = Transformer.from_pretrained("gpt2", peft=peft)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -36,5 +36,5 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     trainer = Trainer(model, optimizer)
     trainer.train(dataset, epochs=1)
-    torch.save(peft.state_dict(), "movies_lora.pt")
+    torch.save(peft.state_dict(), "movies_lokr.pt")
     # peft.load_state_dict(torch.load("tune.pt"))

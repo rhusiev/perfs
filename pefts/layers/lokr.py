@@ -60,10 +60,11 @@ class LoKrLinear(nn.Linear):
 
         if kaiming:
             kaiming_uniform_(self.peft_lokr_C, a=5**0.5)
+            kaiming_uniform_(self.peft_lokr_A, a=5**0.5)
         else:
             nn.init.normal_(self.peft_lokr_C, std=1.0 / self.u_p)
+            nn.init.normal_(self.peft_lokr_A, std=1.0 / self.u_p)
 
-        nn.init.zeros_(self.peft_lokr_A)
         nn.init.zeros_(self.peft_lokr_B)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
