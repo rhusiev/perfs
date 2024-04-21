@@ -17,20 +17,20 @@ if __name__ == "__main__":
     dataset = (
         load_dataset("ajaykarthick/imdb-movie-reviews")["test"]
         .shuffle(0)
-        .select(range(2000))
+        .select(500)
         .map(
             lambda x: {"text": format_message(x), "label": x["label"]},
         )
     )
-    peft = LoKrPeft(36, 6)
+    peft = LoRAPeft(6)
 
-    inference = Inference((peft, "movies_lokr.pt"), "gpt2")
+    inference = Inference((peft, "movies_lora.pt"), "gpt2")
     total = 0
     correct = 0
     for example in dataset:
         total += 1
         completion = inference(example["text"], 2)
-        if "negative" if example["label"] else "positive" in completion:
+        if ("negative" if example["label"] else "positive") in completion:
             correct += 1
         print(
             f"\rAccuracy: {correct / total:.2%}  Done: {total}/{len(dataset)}",
