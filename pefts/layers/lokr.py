@@ -77,10 +77,18 @@ class LoKrLinear(nn.Linear):
             torch.Tensor: Output tensor of shape (batch_size, out_features)
         """
         # Apply LoKr
-        BA = self.peft_lokr_B @ self.peft_lokr_A
-        weight = self.weight + torch.kron(self.peft_lokr_C, BA)
+        batch_dims = x.shape[:-1]
+        kron = nn.functional.linear(
+            nn.functional.linear(
+                nn.functional.linear(
+                    x.view(*batch_dims, self.u_q, self.v_q), self.peft_lokr_A
+                ),
+                self.peft_lokr_B,
+            ).transpose(-1, -2),
+            self.peft_lokr_C,
+        ).view(*batch_dims, self.u_p * self.v_p)
         # Apply Linear layer
-        return nn.functional.linear(x, weight, self.bias)
+        return nn.functional.linear(x, self.weight, self.bias) + kron
 
     def to(self, *args, **kwargs) -> "LoKrLinear":
         """Move the LoKrLinear layer to a device.
@@ -139,16 +147,20 @@ class LoKrPeft(Peft):
         Returns:
             dict[str, nn.Parameter]: State dictionary of the LoKr layers
         """
-        return {
-            f"layers.{i}.peft_lokr_A": layer.peft_lokr_A
-            for i, layer in enumerate(self.layers)
-        } | {
-            f"layers.{i}.peft_lokr_B": layer.peft_lokr_B
-            for i, layer in enumerate(self.layers)
-        } | {
-            f"layers.{i}.peft_lokr_C": layer.peft_lokr_C
-            for i, layer in enumerate(self.layers)
-        }
+        return (
+            {
+                f"layers.{i}.peft_lokr_A": layer.peft_lokr_A
+                for i, layer in enumerate(self.layers)
+            }
+            | {
+                f"layers.{i}.peft_lokr_B": layer.peft_lokr_B
+                for i, layer in enumerate(self.layers)
+            }
+            | {
+                f"layers.{i}.peft_lokr_C": layer.peft_lokr_C
+                for i, layer in enumerate(self.layers)
+            }
+        )
 
     def load_state_dict(self, state_dict: dict[str, nn.Parameter]) -> None:
         """Load the state dictionary of the LoKr layers.
