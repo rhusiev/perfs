@@ -37,9 +37,11 @@ class LoRALinear(nn.Linear):
         if not self.enabled:
             return nn.functional.linear(x, self.weight, self.bias)
         # Apply LoRA
-        weight = self.weight + self.peft_lora_B @ self.peft_lora_A
+        # weight = self.weight + self.peft_lora_B @ self.peft_lora_A
         # Apply Linear layer
-        return nn.functional.linear(x, weight, self.bias)
+        lora_interm = x @ self.peft_lora_B
+        lora_final = lora_interm @ self.peft_lora_A
+        return nn.functional.linear(x, self.weight, self.bias) + lora_final
 
     def to(self, *args, **kwargs) -> "LoRALinear":
         """Move the Linear layer with LoRA to a device
