@@ -39,8 +39,8 @@ class LoRALinear(nn.Linear):
         # Apply LoRA
         # weight = self.weight + self.peft_lora_B @ self.peft_lora_A
         # Apply Linear layer
-        lora_interm = x @ self.peft_lora_B
-        lora_final = lora_interm @ self.peft_lora_A
+        lora_interm = nn.functional.linear(x, self.peft_lora_A)
+        lora_final = nn.functional.linear(lora_interm, self.peft_lora_B)
         return nn.functional.linear(x, self.weight, self.bias) + lora_final
 
     def to(self, *args, **kwargs) -> "LoRALinear":
