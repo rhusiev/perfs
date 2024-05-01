@@ -23,6 +23,8 @@ class LoRALinear(nn.Linear):
         nn.init.normal_(self.peft_lora_A, std=1.0 / lora_rank)
         nn.init.zeros_(self.peft_lora_B)
 
+        self.enabled = True
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the Linear layer with LoRA
 
@@ -32,6 +34,8 @@ class LoRALinear(nn.Linear):
         Returns:
             torch.Tensor: Output tensor of shape (batch_size, out_features)
         """
+        if not self.enabled:
+            return nn.functional.linear(x, self.weight, self.bias)
         # Apply LoRA
         weight = self.weight + self.peft_lora_B @ self.peft_lora_A
         # Apply Linear layer
@@ -98,3 +102,13 @@ class LoRAPeft(Peft):
         for i, layer in enumerate(self.layers):
             layer.peft_lora_A = state_dict[f"layers.{i}.peft_lora_A"]
             layer.peft_lora_B = state_dict[f"layers.{i}.peft_lora_B"]
+
+    def enable_all(self) -> None:
+        """Enable all LoRA layers"""
+        for layer in self.layers:
+            layer.enabled = True
+
+    def disable_all(self) -> None:
+        """Disable all LoRA layers"""
+        for layer in self.layers:
+            layer.enabled = False
