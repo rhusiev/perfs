@@ -14,7 +14,7 @@ You can view our technical report at https://www.overleaf.com/read/mqrwfrtjxsxz#
 
 We implemented a transformer architecture in PyTorch and loaded GPT-2 weights using it.
 
-Then, we implemented different methods to further train (fine-tune) it. As just training the model is resource intensive, and it is widely considered that the inherent dimensionality of weights is lower, we implemented different methods that are more parameter-efficient (i.e. using the same number of parameters to do more): LoRA, LoKr and LoHa.
+Then, we implemented different methods to further train (fine-tune) it. As just training the model is resource intensive and it is considered that the intrinsic ranks of fine-tuning changes are lower, we implemented different methods that are more parameter-efficient (i.e. using the same number of parameters to do more) and use the lower-rank ideas: LoRA, LoKr and LoHa.
 
 # Results
 
